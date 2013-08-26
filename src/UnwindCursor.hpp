@@ -114,7 +114,7 @@ bool DwarfFDECache<A>::fgRegisteredForDyldUnloads = false;
 template <typename A>
 typename A::pint_t DwarfFDECache<A>::findFDE(pint_t mh, pint_t pc)
 {
-	pint_t result = NULL;
+	pint_t result = 0;
 	DEBUG_LOG_NON_ZERO(::pthread_rwlock_rdlock(&fgLock));
 	for(entry* p=fgBuffer; p < fgBufferUsed; ++p) {
 		if ( (mh == p->mh) || (mh == 0) ) {
