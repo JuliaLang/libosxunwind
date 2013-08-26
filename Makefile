@@ -7,7 +7,7 @@ AR = ar
 
 # Flags
 
-CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include
+CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBUG
 CFLAGS_add = -std=c99 -Wall -O3 
 CXXFLAGS_add = -std=c++11 -Wall -O3 
 LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System -lstdc++
