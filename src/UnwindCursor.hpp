@@ -320,6 +320,7 @@ public:
 	virtual bool		isSignalFrame();
 	virtual bool		getFunctionName(char* buf, size_t bufLen, unw_word_t* offset);
 	virtual void		setInfoBasedOnIPRegister(bool isReturnAddress=false);
+	virtual void 		setForceDWARF(bool force);
 
 	void				operator delete(void* p, size_t size) {}
 
@@ -348,7 +349,7 @@ private:
 	bool				mustUseDwarf() const { return false; }
   #endif
 #else
-	bool				mustUseDwarf() const { R dummy; uint32_t offset; return dwarfWithOffset(dummy, offset); }
+	bool				mustUseDwarf() const { R dummy; uint32_t offset; return fForceDwarf || dwarfWithOffset(dummy, offset); }
 #endif
 
 	bool				dwarfWithOffset(uint32_t& offset) const { R dummy; return dwarfWithOffset(dummy, offset); }
@@ -391,17 +392,18 @@ private:
 	compact_unwind_encoding_t		dwarfEncoding(Registers_ppc&)	const { return 0; }
 
 	unw_proc_info_t				fInfo;
-	R							fRegisters;
-	A&							fAddressSpace;
 	bool						fUnwindInfoMissing;
 	bool						fIsSignalFrame;
+	bool 						fForceDwarf;
+	R							fRegisters;
+	A&							fAddressSpace;
 };
 
 typedef UnwindCursor<LocalAddressSpace,Registers_x86> AbstractUnwindCursor;
 
 template <typename A, typename R>
 UnwindCursor<A,R>::UnwindCursor(unw_context_t* context, A& as)
-  : fRegisters(context), fAddressSpace(as), fUnwindInfoMissing(false), fIsSignalFrame(false)
+  : fUnwindInfoMissing(false), fIsSignalFrame(false), fForceDwarf(false), fRegisters(context), fAddressSpace(as)
 {
 	COMPILE_TIME_ASSERT( sizeof(UnwindCursor<A,R>) < sizeof(unw_cursor_t) );
 
@@ -410,7 +412,7 @@ UnwindCursor<A,R>::UnwindCursor(unw_context_t* context, A& as)
 
 template <typename A, typename R>
 UnwindCursor<A,R>::UnwindCursor(A& as, thread_t thread)
-  : fAddressSpace(as), fUnwindInfoMissing(false), fIsSignalFrame(false)
+  : fUnwindInfoMissing(false), fIsSignalFrame(false), fForceDwarf(false), fAddressSpace(as)
 {
 	bzero(&fInfo, sizeof(fInfo));
 	// FIXME
@@ -471,6 +473,11 @@ bool UnwindCursor<A,R>::isSignalFrame()
 	 return fIsSignalFrame;
 }
 
+template <typename A, typename R>
+void UnwindCursor<A,R>::setForceDWARF(bool force) 
+{ 
+	fForceDwarf = force;
+}
 
 template <typename A, typename R>
 bool UnwindCursor<A,R>::getInfoFromDwarfSection(pint_t pc, pint_t mh, pint_t ehSectionStart, uint32_t sectionLength, uint32_t sectionOffsetOfFDE)

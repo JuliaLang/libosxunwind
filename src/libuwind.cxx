@@ -63,12 +63,42 @@ EXPORT int unw_init_local(unw_cursor_t* cursor, unw_context_t* context)
 	// use "placement new" to allocate UnwindCursor in the cursor buffer
 #if __i386__
 	new ((void*)cursor) UnwindCursor<LocalAddressSpace,Registers_x86>(context, sThisAddressSpace);
+	static_assert(sizeof(unw_cursor_t) >= sizeof(UnwindCursor<LocalAddressSpace,Registers_x86>), "libunwind header outdated");
 #elif __x86_64__
 	new ((void*)cursor) UnwindCursor<LocalAddressSpace,Registers_x86_64>(context, sThisAddressSpace);
+	static_assert(sizeof(unw_cursor_t) >= sizeof(UnwindCursor<LocalAddressSpace,Registers_x86_64>), "libunwind header outdated");
 #elif __ppc__
 	new ((void*)cursor) UnwindCursor<LocalAddressSpace,Registers_ppc>(context, sThisAddressSpace);
+	static_assert(sizeof(unw_cursor_t) >= sizeof(UnwindCursor<LocalAddressSpace,Registers_ppc>), "libunwind header outdated");
 #endif
+
 	AbstractUnwindCursor* co = (AbstractUnwindCursor*)cursor;
+	co->setInfoBasedOnIPRegister();
+
+	return UNW_ESUCCESS;
+}
+
+
+///
+/// create a cursor of a thread in this process given 'context' recorded by unw_getcontext()
+///
+EXPORT int unw_init_local_dwarf(unw_cursor_t* cursor, unw_context_t* context)
+{
+	DEBUG_PRINT_API("unw_init_local(cursor=%p, context=%p)\n", cursor, context);
+	// use "placement new" to allocate UnwindCursor in the cursor buffer
+#if __i386__
+	new ((void*)cursor) UnwindCursor<LocalAddressSpace,Registers_x86>(context, sThisAddressSpace);
+	static_assert(sizeof(unw_cursor_t) >= sizeof(UnwindCursor<LocalAddressSpace,Registers_x86>), "libunwind header outdated");
+#elif __x86_64__
+	new ((void*)cursor) UnwindCursor<LocalAddressSpace,Registers_x86_64>(context, sThisAddressSpace);
+	static_assert(sizeof(unw_cursor_t) >= sizeof(UnwindCursor<LocalAddressSpace,Registers_x86_64>), "libunwind header outdated");
+#elif __ppc__
+	new ((void*)cursor) UnwindCursor<LocalAddressSpace,Registers_ppc>(context, sThisAddressSpace);
+	static_assert(sizeof(unw_cursor_t) >= sizeof(UnwindCursor<LocalAddressSpace,Registers_ppc>), "libunwind header outdated");
+#endif
+
+	AbstractUnwindCursor* co = (AbstractUnwindCursor*)cursor;
+	co->setForceDWARF(true);
 	co->setInfoBasedOnIPRegister();
 
 	return UNW_ESUCCESS;

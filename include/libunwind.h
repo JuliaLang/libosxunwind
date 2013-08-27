@@ -104,6 +104,8 @@ extern int         unw_get_proc_name(unw_cursor_t*, char*, size_t, unw_word_t*) 
 //extern int       unw_get_save_loc(unw_cursor_t*, int, unw_save_loc_t*);
 #endif
 
+extern int        unw_init_local_dwarf(unw_cursor_t*, unw_context_t*);
+
 
 #if UNW_REMOTE
 /* 
