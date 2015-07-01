@@ -4,12 +4,13 @@ LIBOSXUNWIND_HOME = $(abspath .)
 
 CC = clang
 AR = ar
+OBJCONV = objconv
 
 # Flags
 
 CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBUG
-CFLAGS_add = -std=c99 -Wall -O3 
-CXXFLAGS_add = -std=c++11 -Wall -O3 
+CFLAGS_add = -std=c99 -Wall -O3
+CXXFLAGS_add = -std=c++11 -Wall -O3
 LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System -lstdc++
 
 # Files (in src/)
@@ -30,7 +31,7 @@ SRCS = 	  	Unwind-sjlj.c \
 			UnwindLevel1.c \
 			libuwind.cxx \
 			unw_getcontext.s \
-			Registers.s 
+			Registers.s
 
 
 # Building
@@ -55,9 +56,15 @@ OBJS = 	$(patsubst %.c,%.c.o,			\
 
 
 libosxunwind.a: $(OBJS)  
+ifeq (,$(SYMFILE))
 	$(AR) -rcs libosxunwind.a $(OBJS)
+else
+	$(AR) -rcs libosxunwind.a.orig $(OBJS)
+	$(OBJCONV) @$(SYMFILE) libosxunwind.a.orig libosxunwind.a
+endif
+
 libosxunwind.dylib: $(OBJS)
-	$(CC) -shared $(LDFLAGS_add) $(OBJS) $(LDFLAGS) -o libosxunwind.dylib
+	$(CC) -shared $(LDFLAGS_add) libosxunwind.a $(LDFLAGS) -o libosxunwind.dylib
 
 clean:
 	rm -f $(OBJS) *.a *.dylib
