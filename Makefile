@@ -12,6 +12,7 @@ CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBU
 CFLAGS_add = -std=c99 -Wall -O3
 CXXFLAGS_add = -std=c++11 -Wall -O3
 LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System -lstdc++
+SFLAGS_add = -x assembler-with-cpp
 
 # Files (in src/)
 
@@ -52,7 +53,7 @@ OBJS = 	$(patsubst %.c,%.c.o,			\
 	$(CC) $(CPPFLAGS_add) $(CPPFLAGS) $(CXXFLAGS_add) $(CXXFLAGS) -c $< -o $@
 
 %.s.o: %.s
-	$(CC) $(SFLAGS) $(filter -m% -B% -I% -D%,$(CFLAGS_add)) -c $< -o $@
+	$(CC) $(SFLAGS) $(SFLAGS_add) $(filter -m% -B% -I% -D%,$(CFLAGS_add)) -c $< -o $@
 
 
 libosxunwind.a: $(OBJS)  
