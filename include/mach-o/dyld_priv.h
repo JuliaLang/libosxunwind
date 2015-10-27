@@ -29,7 +29,7 @@
 #include <mach-o/dyld.h>
 #include <mach-o/dyld_images.h>
 
-#if __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
@@ -104,7 +104,7 @@ typedef struct {
     size_t tlv_size;     // Byte size of TLV storage
 } dyld_tlv_info;
 
-#if __BLOCKS__
+#ifdef __BLOCKS__
 
 // 
 // Callback that notes changes to thread-local variable storage.
@@ -213,7 +213,7 @@ extern uint32_t dyld_get_program_min_os_version();
 
 
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED	
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 //
 // Returns if any OS dylib has overridden its copy in the shared cache
 //
@@ -223,7 +223,7 @@ extern bool dyld_shared_cache_some_image_overridden();
 
 
 
-#if __cplusplus
+#ifdef __cplusplus
 }
 #endif /* __cplusplus */
 

@@ -86,7 +86,7 @@ typedef struct unw_proc_info_t unw_proc_info_t;
 extern "C" {
 #endif
 
-#if !__arm__
+#ifndef __arm__
 extern int         unw_getcontext(unw_context_t*)                               __OSX_AVAILABLE_STARTING(__MAC_10_6,__IPHONE_5_0);
 extern int         unw_init_local(unw_cursor_t*, unw_context_t*)                __OSX_AVAILABLE_STARTING(__MAC_10_6,__IPHONE_5_0);
 extern int         unw_step(unw_cursor_t*)                                      __OSX_AVAILABLE_STARTING(__MAC_10_6,__IPHONE_5_0);
@@ -107,7 +107,7 @@ extern int         unw_get_proc_name(unw_cursor_t*, char*, size_t, unw_word_t*) 
 extern int        unw_init_local_dwarf(unw_cursor_t*, unw_context_t*);
 
 
-#if UNW_REMOTE
+#ifdef UNW_REMOTE
 /* 
  * Mac OS X "remote" API for unwinding other processes on same machine
  *
