@@ -67,7 +67,7 @@ struct _Unwind_Exception {
 	void					 (*exception_cleanup)(_Unwind_Reason_Code reason, struct _Unwind_Exception* exc);
 	uintptr_t                  private_1;        // non-zero means forced unwind
 	uintptr_t                  private_2;        // holds sp that phase1 found for phase2 to use
-#if !__LP64__
+#ifndef __LP64__
 	// The gcc implementation of _Unwind_Exception used attribute mode on the above fields
 	// which had the side effect of causing this whole struct to round up to 32 bytes in size.
 	// To be more explicit, we add pad fields added for binary compatibility.  
@@ -101,7 +101,7 @@ extern "C" {
 //
 // The following are the base functions documented by the C++ ABI
 //
-#if __arm__
+#ifdef __arm__
 	extern _Unwind_Reason_Code _Unwind_SjLj_RaiseException(struct _Unwind_Exception* exception_object);
 	extern void		          _Unwind_SjLj_Resume(struct _Unwind_Exception* exception_object);
 #else
@@ -115,13 +115,13 @@ extern uintptr_t _Unwind_GetIP(struct _Unwind_Context* context);
 extern void		_Unwind_SetIP(struct _Unwind_Context*, uintptr_t new_value);
 extern uintptr_t _Unwind_GetRegionStart(struct _Unwind_Context* context);
 extern uintptr_t _Unwind_GetLanguageSpecificData(struct _Unwind_Context* context);
-#if __arm__
+#ifdef __arm__
 	extern _Unwind_Reason_Code _Unwind_SjLj_ForcedUnwind(struct _Unwind_Exception* exception_object, _Unwind_Stop_Fn stop, void* stop_parameter );
 #else	
 	extern _Unwind_Reason_Code _Unwind_ForcedUnwind(struct _Unwind_Exception* exception_object, _Unwind_Stop_Fn stop, void* stop_parameter );
 #endif
 
-#if __arm__
+#ifdef __arm__
 	typedef struct _Unwind_FunctionContext* _Unwind_FunctionContext_t;
 	extern void _Unwind_SjLj_Register(_Unwind_FunctionContext_t fc);
 	extern void _Unwind_SjLj_Unregister(_Unwind_FunctionContext_t fc);
@@ -135,7 +135,7 @@ extern uintptr_t _Unwind_GetLanguageSpecificData(struct _Unwind_Context* context
 //
 //	called by __cxa_rethrow().  
 //
-#if __arm__
+#ifdef __arm__
 	extern _Unwind_Reason_Code _Unwind_SjLj_Resume_or_Rethrow(struct _Unwind_Exception* exception_object);
 #else
 	extern _Unwind_Reason_Code _Unwind_Resume_or_Rethrow(struct _Unwind_Exception* exception_object);
