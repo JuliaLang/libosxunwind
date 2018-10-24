@@ -11,7 +11,7 @@ OBJCONV = objconv
 CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBUG
 CFLAGS_add = -std=c99 -Wall -O3
 CXXFLAGS_add = -std=c++11 -stdlib=libstdc++ -Wall -O3
-LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System
+LDFLAGS_add = -nodefaultlibs -stdlib=libstdc++ -Wl,-upward-lSystem -Wl,-umbrella,System
 SFLAGS_add = -x assembler-with-cpp
 
 # Files (in src/)
