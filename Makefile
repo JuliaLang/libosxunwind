@@ -10,9 +10,16 @@ OBJCONV = objconv
 
 CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBUG
 CFLAGS_add = -std=c99 -Wall -O3
+SFLAGS_add = -x assembler-with-cpp
+
+CLANG_MAJOR_VER := $(shell clang -v 2>&1 | grep LLVM | cut -d' ' -f 4 | cut -d'.' -f 1)
+ifeq ($(shell [ $(CLANG_MAJOR_VER) -ge 8 ] && echo true),true)
+CXXFLAGS_add = -std=c++11 -stdlib=libstdc++ -Wall -O3
+LDFLAGS_add = -nodefaultlibs -stdlib=libstdc++ -Wl,-upward-lSystem -Wl,-umbrella,System
+else
 CXXFLAGS_add = -std=c++11 -Wall -O3
 LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System -lstdc++
-SFLAGS_add = -x assembler-with-cpp
+endif
 
 # Files (in src/)
 
