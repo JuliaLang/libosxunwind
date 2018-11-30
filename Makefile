@@ -83,4 +83,4 @@ libosxunwind.dylib: $(OBJS)
 clean:
 	rm -f $(OBJS) *.a *.dylib
 distclean: clean
-	
+.SUFFIXES: .cxx
