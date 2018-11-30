@@ -65,7 +65,8 @@ OBJS = 	$(patsubst %.c,%.c.o,			\
 	$(CC) $(CPPFLAGS_add) $(CPPFLAGS) $(CXXFLAGS_add) $(CXXFLAGS) -c $< -o $@
 
 %.s.o: %.s
-	$(CC) $(SFLAGS) $(SFLAGS_add) $(filter -m% -B% -I% -D%,$(CFLAGS_add)) -c $< -o $@
+	$(CC) $(SFLAGS_add) $(SFLAGS) $(filter -m% -B% -I% -D%,$(CFLAGS_add)) -c $< -o $@
+
 
 
 libosxunwind.a: $(OBJS)  
