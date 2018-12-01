@@ -15,7 +15,7 @@ LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System
 SFLAGS_add = -x assembler-with-cpp
 
 # If `-stdlib=` is specified within our environment variables, then don't add another command line argument asking to link against it..
-ifneq (,$(findstring -stdlib=,$(CC) $(CPPFLAGS) $(CXXFLAGS)))
+ifeq (,$(findstring -stdlib=,$(CC) $(CPPFLAGS) $(CXXFLAGS)))
 # If our clang is new enough, then we need to add in `-stdlib=libstdc++`.
 CLANG_MAJOR_VER := $(shell clang -v 2>&1 | grep LLVM | cut -d' ' -f 4 | cut -d'.' -f 1)
 ifeq ($(shell [ $(CLANG_MAJOR_VER) -ge 8 ] && echo true),true)
