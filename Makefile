@@ -31,45 +31,44 @@ endif
 
 # Files (in src/)
 
-HEADERS  = 	AddressSpace.hpp 		\
-			CompactUnwinder.hpp 	\
-			DwarfInstructions.hpp 	\
-			DwarfParser.hpp 		\
-			FileAbstraction.hpp		\
-			InternalMacros.h 		\
-			Registers.hpp			\
-			UnwindCursor.hpp		\
-			libunwind_priv.h 		\
-			dwarf2.h
+CXXHEADERS = \
+			src/AddressSpace.hpp 		\
+			src/CompactUnwinder.hpp 	\
+			src/DwarfInstructions.hpp 	\
+			src/DwarfParser.hpp 		\
+			src/FileAbstraction.hpp		\
+			src/Registers.hpp			\
+			src/UnwindCursor.hpp
 
-SRCS = 	  	Unwind-sjlj.c \
-			UnwindLevel1-gcc-ext.c \
-			UnwindLevel1.c \
-			libuwind.cxx \
-			unw_getcontext.s \
-			Registers.s
+HEADERS  = 	src/InternalMacros.h 		\
+			src/libunwind_priv.h 		\
+			src/dwarf2.h				\
+			$(shell find include -name '*.h')
+
+SRCS = 	  	src/Unwind-sjlj.c \
+			src/UnwindLevel1-gcc-ext.c \
+			src/UnwindLevel1.c \
+			src/libuwind.cxx \
+			src/unw_getcontext.s \
+			src/Registers.s
 
 
 # Building
 
 all: libosxunwind.a libosxunwind.dylib
 
-override SRCS := $(addprefix src/,$(SRCS))
-override HEADERS := $(addprefix src/,$(HEADERS))
-
 OBJS = 	$(patsubst %.c,%.c.o,			\
 		$(patsubst %.s,%.s.o,			\
 		$(patsubst %.cxx,%.cxx.o,$(SRCS))))
 
-%.c.o: %.c
+%.c.o: %.c $(HEADERS)
 	$(CC) $(CPPFLAGS_add) $(CPPFLAGS) $(CFLAGS_add) $(CFLAGS) -c $< -o $@
 
-%.cxx.o: %.cxx
+%.cxx.o: %.cxx $(HEADERS) $(CXXHEADERS)
 	$(CC) $(CPPFLAGS_add) $(CPPFLAGS) $(CXXFLAGS_add) $(CXXFLAGS) -c $< -o $@
 
 %.s.o: %.s
 	$(CC) $(SFLAGS_add) $(SFLAGS) $(filter -m% -B% -I% -D%,$(CFLAGS_add)) -c $< -o $@
-
 
 
 libosxunwind.a: $(OBJS)  
@@ -86,4 +85,16 @@ libosxunwind.dylib: libosxunwind.a
 clean:
 	rm -f $(OBJS) *.a *.dylib
 distclean: clean
+
+define newline # a literal \n
+
+
+endef
+
+# Makefile debugging trick:
+# call print-VARIABLE to see the runtime value of any variable
+# (hardened against any special characters appearing in the output)
+print-%:
+	@echo '$*=$(subst ','\'',$(subst $(newline),\n,$($*)))'
+
 .SUFFIXES: .cxx
