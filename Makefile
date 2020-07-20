@@ -8,21 +8,24 @@ OBJCONV = objconv
 
 # Flags
 
-CPPFLAGS_add = -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBUG
-CFLAGS_add = -std=c99 -Wall -O3
-CXXFLAGS_add = -std=c++11 -Wall -O3
-LDFLAGS_add = -nodefaultlibs -Wl,-upward-lSystem -Wl,-umbrella,System
+CPPFLAGS_add = -Wall -pedantic -I$(LIBOSXUNWIND_HOME)/src -I$(LIBOSXUNWIND_HOME)/include -DNDEBUG
+CFLAGS_add = -std=c99 -O3
+CXXFLAGS_add = -std=c++11 -O3 -fno-rtti
+LDFLAGS_add =
 SFLAGS_add = -x assembler-with-cpp
+
+DARWINVER := $(shell uname -r | cut -b 1-2)
 
 # If `-stdlib=` is specified within our environment variables, then don't add another command line argument asking to link against it..
 ifeq (,$(findstring -stdlib=,$(CC) $(CPPFLAGS) $(CXXFLAGS)))
-# If our clang is new enough, then we need to add in `-stdlib=libstdc++`.
-CLANG_MAJOR_VER := $(shell clang -v 2>&1 | grep LLVM | cut -d' ' -f 4 | cut -d'.' -f 1)
-ifeq ($(shell [ $(CLANG_MAJOR_VER) -ge 8 ] && echo true),true)
-CXXFLAGS_add += -stdlib=libstdc++
-LDFLAGS_add += -stdlib=libstdc++
+DARWINVER_GTE13 := $(shell expr `uname -r | cut -b 1-2` \>= 13)
+ifeq ($(DARWINVER_GTE13),1)
+CXXFLAGS_add += -stdlib=libc++
+LDFLAGS_add += -stdlib=libc++
+CPPFLAGS_add += -mmacosx-version-min=10.8
 else
 LDFLAGS_add += -lstdc++
+CPPFLAGS_add += -mmacosx-version-min=10.6
 endif
 endif
 
@@ -71,14 +74,14 @@ OBJS = 	$(patsubst %.c,%.c.o,			\
 
 libosxunwind.a: $(OBJS)  
 ifeq (,$(SYMFILE))
-	$(AR) -rcs libosxunwind.a $(OBJS)
+	$(AR) -rcs $@ $^
 else
-	$(AR) -rcs libosxunwind.a.orig $(OBJS)
-	$(OBJCONV) @$(SYMFILE) libosxunwind.a.orig libosxunwind.a
+	$(AR) -rcs $@.orig $^
+	$(OBJCONV) @$(SYMFILE) $@.orig $@
 endif
 
-libosxunwind.dylib: $(OBJS)
-	$(CC) -shared $(LDFLAGS_add) libosxunwind.a $(LDFLAGS) -o libosxunwind.dylib
+libosxunwind.dylib: libosxunwind.a
+	$(CC) -shared $(LDFLAGS_add) -Wl,-all_load $< $(LDFLAGS) -o $@
 
 clean:
 	rm -f $(OBJS) *.a *.dylib
